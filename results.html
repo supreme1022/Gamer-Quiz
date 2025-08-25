@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gamer Quiz</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="quiz.js" defer></script>
+</head>
+<body>
+    <header>
+        <h1>GAMER<br> QUIZ</h1>
+    </header>
+
+    <main>
+        <h2>Results</h2>
+        <p>Here are the results along with the correct answers from your submitted Gamer Quiz!</p>
+
+        <div id="results-container"></div>
+        <div class="summary" id="summary"></div>
+    </main>
+    <script>
+        // Get stored results from localStorage
+        const quizResults = JSON.parse(localStorage.getItem("quizResults")) || [];
+      
+        const resultsContainer  = document.getElementById("results-container"); // where the individual question results will go
+        const summary  = document.getElementById("summary"); // summary of how many answers you got correct will appear 
+
+        if (quizResults.length === 0){ // if there are no quiz results (array is empty)...
+            resultsContainer.textContent = "No quiz results found."; // ...message is displayed
+            summary.textContent = " "; // ...clears the summary area
+            // Early exit so nothing else tries to run
+            throw new Error("No quiz results to display"); // stops script early
+        }
+
+        let correctCount = 0; // counter for amount of questions user got correct
+
+        // loop that runs through every item in quizResults array
+        quizResults.forEach((item, index) => { // item: current result, index: question number
+            const isCorrect = item.userAnswer.toLowerCase() === item.correctAnswer.toString().toLowerCase(); //compares user answer with correct one, .toLowerCase() ignores capitalization, .toString() is used in case answer is a number
+            if (isCorrect) correctCount++; // if user answer is correct a point is added to their score
+
+            const div = document.createElement("div"); // makes new <div> in memory to hold question's result
+            div.classList.add("result"); // adds CSS classList of result to the <div>
+            div.classList.add(isCorrect ? "correct" : "incorrect"); // adds either correct or incorrect based on how user answers (can be styled differently from each other CSS) 
+           
+            // using template string, sets contents of <div>
+            div.innerHTML = `
+                <strong>Question${index + 1}:</strong> ${item.question}<br>
+                <strong>Your Answer:</strong> ${item.userAnswer}<br>
+                <strong>Correct Answer:</strong> ${item.correctAnswer}
+                ${isCorrect ? "- Correct" : "- Incorrect"}`; 
+            resultsContainer.appendChild(div); // adds filled-in <div> to results container on page so that it becomes visible
+        }); // closes forEach loop
+
+        summary.textContent = `You got ${correctCount} out of ${quizResults.length} correct.`; // displays final score wherever summary element is placed
+
+    </script>
+
+    <form action="quiz.html" method="get">
+        <button type="submit">Try Again</button>
+    </form>
+    <footer>
+        <p>&copy; Supreme P Constantine Projects. All rights reserved.</p>
+    </footer>    
+</body>
+</html>
